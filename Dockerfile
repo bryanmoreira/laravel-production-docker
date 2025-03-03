@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
+    php-mysql \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala o Composer
