@@ -3,11 +3,19 @@ FROM php:8.2-cli
 
 # Instala dependências do sistema
 RUN apt-get update && apt-get install -y \
+    lsb-release \
+    ca-certificates \
+    apt-transport-https \
+    software-properties-common && \
+    add-apt-repository ppa:ondrej/php && \
+    apt-get update && \
+    apt-get install -y \
     unzip \
     git \
     curl \
     php-mysql \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Instala o Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
