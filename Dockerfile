@@ -1,37 +1,30 @@
-# Usa a imagem oficial do PHP com suporte a FPM e extensões
-FROM php:8.2-fpm
+# Usa a imagem oficial do PHP com extensões necessárias
+FROM php:8.2-cli
 
-# Instala extensões necessárias do PHP
+# Instala dependências do sistema
 RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    zip \
     unzip \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql opcache
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instala o Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Define o diretório de trabalho
 WORKDIR /var/www
 
-# Copia os arquivos do Laravel para o container
+# Copia os arquivos do Laravel para dentro do container
 COPY . .
 
-# Baixa e instala o Composer dentro do container
-RUN apt-get update && apt-get install -y curl && \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-
-# Instala dependências do Laravel
+# Instala as dependências do Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# Dá permissão para a pasta de cache e logs
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Dá permissão para storage e cache
+RUN chmod -R 777 storage bootstrap/cache
 
-# Expõe a porta 9000 do PHP-FPM
-EXPOSE 9000
+# Expõe a porta 8000 do Laravel
+EXPOSE 8000
 
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-RUN chmod -R 777 /var/www/storage /var/www/bootstrap/cache
-
-CMD ["php-fpm"]
+# Comando para rodar o Laravel com artisan
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
