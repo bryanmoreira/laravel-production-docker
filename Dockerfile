@@ -3,18 +3,13 @@ FROM php:8.2-cli
 
 # Instala dependências do sistema
 RUN apt-get update && apt-get install -y \
-    lsb-release \
-    ca-certificates \
-    apt-transport-https \
-    software-properties-common && \
-    add-apt-repository ppa:ondrej/php && \
-    apt-get update && \
-    apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    zip \
     unzip \
-    git \
-    curl \
-    php-mysql \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd pdo pdo_mysql opcache
 
 
 # Instala o Composer
